@@ -93,6 +93,17 @@ claude
 
 > "这个领域最新进展是什么？哪里有 gap？"
 
+还没有具体 idea？给一个研究方向就行——`/idea-creator` 搞定剩下的：
+
+1. 📚 **调研**全景（最新论文、开放问题、反复出现的局限性）
+2. 🧠 **头脑风暴** 8-12 个具体 idea（GPT-5.4 xhigh）
+3. 🔍 **初筛**可行性、算力成本、快速查新
+4. 🛡️ **深度验证** top idea（完整查新 + devil's advocate review）
+5. 🧪 **并行 pilot 实验**（top 2-3 个 idea 分别上不同 GPU，30 分钟 - 2 小时）
+6. 🏆 **按实验信号排序**——有正信号的 idea 排前面
+
+输出 `IDEA_REPORT.md`：含假设、pilot 结果、审稿人可能的质疑、建议执行顺序。失败的 idea 也记录在案，避免重复踩坑。
+
 **涉及 Skills：** `research-lit` + `idea-creator` + `novelty-check` + `research-review`
 
 > 💡 **一键调用：** `/idea-discovery "你的研究方向"` 自动跑完整个工作流 1。
