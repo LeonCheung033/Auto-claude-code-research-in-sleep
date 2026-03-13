@@ -194,35 +194,35 @@ NARRATIVE_REPORT.md ──► /paper-plan ──► /paper-figure ──► /pap
 
 工作流 3 生成论文后，`/auto-paper-improvement-loop` 自动跑 2 轮 GPT-5.4 xhigh 审稿 → 修复 → 重新编译，将粗稿自动提升到接近可投稿质量。
 
-**分数变化（实测 — MoLR-MoG ICLR 2026 理论论文）：**
+**分数变化（实测 — 生成了一篇 9 页 ICLR 2026 理论论文）：**
 
 | 轮次 | 分数 | 判定 | 关键改动 |
 |------|------|------|---------|
 | Round 0（原始） | 4/10 | No | 基线生成论文 |
 | Round 1 | 6/10 | Almost | 修复假设、软化声明、重命名符号 |
-| Round 2 | ~7/10 | Almost→Yes | 添加合成实验、正式 truncation 命题 |
+| Round 2 | ~7/10 | Almost→Yes | 添加合成实验、正式化非正式论证 |
 
 **2 轮涨 3 分** —— 从 "明确拒稿" 到 "borderline accept"。
 
 <details>
 <summary>Round 1 修复细节（6 项）</summary>
 
-1. **CRITICAL — Bounded support 与 Gaussian 矛盾**：假设 1 要求有界支撑 `||x|| ≤ R`，但模型是精确高斯（无界）。改为 "有界参数 + 亚高斯尾" 的截断高斯混合。
-2. **CRITICAL — 理论-实验 gap**：理论假设线性编码器，实验用非线性 VAE。"validate" → "demonstrate practical relevance"，添加明确说明。
-3. **MAJOR — 缺定量指标**：添加参数量对比表（latent vs total），注明 "10×" 仅指 latent score 网络。
+1. **CRITICAL — 假设与模型矛盾**：有界性假设与模型的分布族不一致。改为与尾部兼容的假设，并添加正式截断桥接。
+2. **CRITICAL — 理论-实验 gap**：理论假设理想化编码器，实验用学习的非线性编码器。软化 "validate" → "demonstrate practical relevance"，添加明确声明。
+3. **MAJOR — 缺定量指标**：添加参数量对比表（latent vs total），诚实计入系统总开销。
 4. **MAJOR — 定理不自包含**：添加 "Interpretation" 段落，显式列出所有依赖。
-5. **MAJOR — 优化声明过宽**："首个收敛保证" → "首个 separated MoLR-MoG + fixed encoders 的局部保证"。
-6. **MAJOR — 符号冲突**：`n_k`（模式数）→ `m_k`，避免与 `n`（样本量）混淆。添加 Notation 段。
+5. **MAJOR — 新颖性声明过宽**：将宽泛的 "首个收敛保证" 精确限定到具体成立条件。
+6. **MAJOR — 符号冲突**：重命名一个与另一关键变量冲突的符号。添加 Notation 段。
 
 </details>
 
 <details>
 <summary>Round 2 修复细节（4 项）</summary>
 
-1. **MAJOR — 缺理论验证实验**：添加 §4.5 合成验证——估计误差 vs 环境维度 D（验证 dimension-free）+ 优化收敛速率（验证线性收敛）。
-2. **MAJOR — 声明仍然过强**："comparable to U-Net" → "qualitatively competitive"，全文统一。
-3. **MAJOR — Truncation 论证不正式**：添加正式 Proposition 1，truncation error 为 O(n⁻²)，被 O(n⁻¹/²) 估计误差主导。
-4. **MINOR — 局限性不足**：扩展为显式列出所有假设（已知 K, d_k, m_k；固定编码器；分离条件）。
+1. **MAJOR — 缺理论验证实验**：添加合成验证子节，在受控条件下直接测试两个核心理论预测。
+2. **MAJOR — 声明仍然过强**：将强等价声明替换为适当的 hedge 语言，全文统一。
+3. **MAJOR — 非正式理论论证**：将非正式论证正式化为一个命题，给出显式误差界。
+4. **MINOR — 局限性不足**：扩展为显式列出所有假设，承认缺少标准评估指标。
 
 </details>
 
