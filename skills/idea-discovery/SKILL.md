@@ -94,27 +94,35 @@ deep-reads/
 └── ...
 ```
 
-**Synthesize a Deep Reading Summary** — after all papers are read, compile:
+**Synthesize a Deep Reading Summary** — after all papers are read, compile a concise index file `deep-reads/INDEX.md`:
 
 ```markdown
-## Deep Reading Synthesis
+# Deep Reading Index
 
-### Method Landscape (from deep reads)
-| Paper | Core Method | Key Innovation | Weakness | Borrowable Element |
-|-------|------------|----------------|----------|-------------------|
+## Papers Read
+| # | Paper | arXiv/URL | Notes File | Core Method | Key Weakness |
+|---|-------|-----------|------------|-------------|--------------|
+| 1 | [title] | [url] | `deep-reads/paper1_notes.md` | [1 sentence] | [1 sentence] |
+| 2 | ... | ... | ... | ... | ... |
 
-### Gap Analysis (upgraded from Phase 1)
+## Gap Analysis (upgraded from Phase 1)
 Based on module-level understanding of existing methods:
 - **Gap 1**: [specific technical gap, citing method details from deep reads]
 - **Gap 2**: ...
 
-### Design Space for New Ideas
+## Design Space for New Ideas
 From the deep reads, the following design dimensions are open:
 - [dimension 1]: [what existing papers do vs what's unexplored]
 - [dimension 2]: ...
+
+## How to Use These Notes
+Downstream skills (e.g., `/idea-creator`) should:
+1. Read this INDEX.md for the overview
+2. Use `Read` tool on individual `*_notes.md` files when deeper detail is needed
+   (e.g., to understand a specific module, check experiment numbers, or verify a gap claim)
 ```
 
-This synthesis replaces the shallow landscape from Phase 1 as the primary input to Phase 2.
+This INDEX.md (compact, ~200 lines) replaces the shallow Phase 1 landscape as primary input to Phase 2. The full notes stay on disk for on-demand access — downstream skills read individual files only when they need deeper detail.
 
 **🚦 Checkpoint:** Present the deep reading synthesis. Ask:
 

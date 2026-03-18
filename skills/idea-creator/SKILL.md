@@ -29,7 +29,11 @@ Given a broad research direction from the user, systematically generate, validat
 
 Map the research area to understand what exists and where the gaps are.
 
-1. **Scan local paper library first**: Check `papers/` and `literature/` in the project directory for existing PDFs. Read first 3 pages of relevant papers to build a baseline understanding before searching online. This avoids re-discovering what the user already knows.
+1. **Check for deep reading notes first**: Look for `deep-reads/INDEX.md` in the project directory.
+   - **If found** (called from `/idea-discovery` pipeline): Read `INDEX.md` as the primary landscape source. This contains a curated gap analysis and design space from detailed paper readings. When generating ideas in Phase 2, refer to specific `deep-reads/*_notes.md` files (via `Read` tool) for module-level method details, experiment numbers, or to verify gap claims. **Do NOT read all notes upfront** — only read individual files on-demand when you need deeper evidence for a specific idea or gap.
+   - **If not found** (standalone invocation): Proceed with the standard survey below.
+
+2. **Scan local paper library**: Check `papers/` and `literature/` in the project directory for existing PDFs. Read first 3 pages of relevant papers to build a baseline understanding before searching online. This avoids re-discovering what the user already knows.
 
 2. **Search recent literature** using WebSearch:
    - Top venues in the last 2 years (NeurIPS, ICML, ICLR, ACL, EMNLP, etc.)
