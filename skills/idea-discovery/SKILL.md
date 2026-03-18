@@ -14,8 +14,8 @@ Orchestrate a complete idea discovery workflow for: **$ARGUMENTS**
 This skill chains sub-skills into a single automated pipeline:
 
 ```
-/research-lit → /idea-creator → /novelty-check → /research-review → /research-refine-pipeline
-  (survey)      (brainstorm)    (verify novel)    (critical feedback)  (refine method + plan experiments)
+/research-lit → /paper-notes-lite (top N) → /idea-creator → /novelty-check → /research-review → /research-refine-pipeline
+  (survey)      (deep reading)               (brainstorm)    (verify novel)    (critical feedback)  (refine method + plan experiments)
 ```
 
 Each phase builds on the previous one's output. The final deliverables are a validated `IDEA_REPORT.md` with ranked ideas, plus a refined proposal (`refine-logs/FINAL_PROPOSAL.md`) and experiment plan (`refine-logs/EXPERIMENT_PLAN.md`) for the top idea.
@@ -29,6 +29,8 @@ Each phase builds on the previous one's output. The final deliverables are a val
 - **AUTO_PROCEED = true** — If user doesn't respond at a checkpoint, automatically proceed with the best option after presenting results. Set to `false` to always wait for explicit user confirmation.
 - **REVIEWER_MODEL = `gpt-5.4`** — Model used via Codex MCP. Must be an OpenAI model (e.g., `gpt-5.4`, `o3`, `gpt-4o`). Passed to sub-skills.
 - **ARXIV_DOWNLOAD = false** — When `true`, `/research-lit` downloads the top relevant arXiv PDFs during Phase 1. When `false` (default), only fetches metadata. Passed through to `/research-lit`.
+- **DEEP_READ_COUNT = 5** — Number of top-ranked papers from Phase 1 to deep-read via `/paper-notes-lite` in Phase 1.5. Set to `0` to skip deep reading entirely.
+- **DEEP_READ_PARALLEL = true** — When `true`, launch deep reads as parallel Agent sub-tasks. When `false`, read sequentially (slower but lower resource usage).
 
 > 💡 These are defaults. Override by telling the skill, e.g., `/idea-discovery "topic" — pilot budget: 4h per idea, 20h total` or `/idea-discovery "topic" — arxiv download: true`.
 
@@ -58,8 +60,76 @@ Does this match your understanding? Should I adjust the scope before generating 
 (If no response, I'll proceed with the top-ranked direction.)
 ```
 
-- **User approves** (or no response + AUTO_PROCEED=true) → proceed to Phase 2 with best direction.
+- **User approves** (or no response + AUTO_PROCEED=true) → proceed to Phase 1.5 with best direction.
 - **User requests changes** (e.g., "focus more on X", "ignore Y", "too broad") → refine the search with updated queries, re-run `/research-lit` with adjusted scope, and present again. Repeat until the user is satisfied.
+
+### Phase 1.5: Deep Reading (paper-notes-lite)
+
+From Phase 1's results, select the **top DEEP_READ_COUNT papers** most relevant to the research direction. Rank by:
+1. Direct relevance to the target problem (highest priority)
+2. Recency (prefer last 1-2 years)
+3. Venue quality (top-tier > workshop > preprint)
+4. Cited as key baseline or closest competitor
+
+For each selected paper, invoke `/paper-notes-lite`:
+
+```
+/paper-notes-lite "[arXiv URL or paper PDF]"
+```
+
+**Execution strategy:**
+- If `DEEP_READ_PARALLEL = true`: launch all deep reads as parallel Agent sub-tasks (faster, recommended)
+- If `DEEP_READ_PARALLEL = false`: read sequentially (lower resource usage)
+
+**What this produces (per paper):**
+- Structured 6-part notes: Background → Motivation/Gap → Method (module-level detail, formulas) → Experiments (full tables, ablations) → Limitations → Wrap-up
+- Critical analysis from an experienced ML researcher perspective
+- Concrete "巧妙之处 / 潜在弱点 / 可借鉴之处" for each paper
+
+**Save deep reading notes** to `deep-reads/` directory:
+```
+deep-reads/
+├── [paper1_short_name]_notes.md
+├── [paper2_short_name]_notes.md
+└── ...
+```
+
+**Synthesize a Deep Reading Summary** — after all papers are read, compile:
+
+```markdown
+## Deep Reading Synthesis
+
+### Method Landscape (from deep reads)
+| Paper | Core Method | Key Innovation | Weakness | Borrowable Element |
+|-------|------------|----------------|----------|-------------------|
+
+### Gap Analysis (upgraded from Phase 1)
+Based on module-level understanding of existing methods:
+- **Gap 1**: [specific technical gap, citing method details from deep reads]
+- **Gap 2**: ...
+
+### Design Space for New Ideas
+From the deep reads, the following design dimensions are open:
+- [dimension 1]: [what existing papers do vs what's unexplored]
+- [dimension 2]: ...
+```
+
+This synthesis replaces the shallow landscape from Phase 1 as the primary input to Phase 2.
+
+**🚦 Checkpoint:** Present the deep reading synthesis. Ask:
+
+```
+📖 Deep reading of N papers complete. Key insights:
+- [upgraded gap analysis with method-level evidence]
+- [design dimensions identified]
+
+Ready to generate ideas based on this deeper understanding?
+(If no response, I'll proceed to idea generation.)
+```
+
+- **User approves** (or AUTO_PROCEED=true) → proceed to Phase 2.
+- **User wants more papers read** → add papers to the deep-read list, run additional `/paper-notes-lite`.
+- **User wants to adjust direction** → go back to Phase 1.
 
 ### Phase 2: Idea Generation + Filtering + Pilots
 
@@ -166,13 +236,20 @@ Finalize `IDEA_REPORT.md` with all accumulated information:
 
 **Direction**: $ARGUMENTS
 **Date**: [today]
-**Pipeline**: research-lit → idea-creator → novelty-check → research-review → research-refine-pipeline
+**Pipeline**: research-lit → paper-notes-lite (deep reading) → idea-creator → novelty-check → research-review → research-refine-pipeline
 
 ## Executive Summary
 [2-3 sentences: best idea, key evidence, recommended next step]
 
 ## Literature Landscape
-[from Phase 1]
+[from Phase 1 — broad survey]
+
+## Deep Reading Notes
+[from Phase 1.5 — module-level analysis of top papers]
+- Method Landscape table (Core Method / Key Innovation / Weakness / Borrowable Element)
+- Upgraded Gap Analysis with technical evidence
+- Design Space dimensions for new ideas
+- Individual notes: `deep-reads/*.md`
 
 ## Ranked Ideas
 [from Phase 2, updated with Phase 3-4 results]
