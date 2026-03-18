@@ -81,8 +81,22 @@ For each selected paper, invoke `/paper-notes-lite`:
 - If `DEEP_READ_PARALLEL = true`: launch all deep reads as parallel Agent sub-tasks (faster, recommended)
 - If `DEEP_READ_PARALLEL = false`: read sequentially (lower resource usage)
 
+**CRITICAL — Agent dispatch instructions:**
+Each Agent sub-task MUST invoke the `paper-notes-lite` skill via the `Skill` tool, NOT use a custom template. The dispatch prompt should be:
+```
+You are reading a paper for the idea discovery pipeline.
+
+1. Use the Skill tool to invoke "paper-notes-lite" with argument "[arXiv URL]"
+2. Follow the skill's template EXACTLY (6-part structure: 第0部分-第6部分 + 附录)
+3. Save the output to: [target path]
+
+Additional focus areas for this paper (append to the notes):
+- [specific questions from the research direction]
+```
+Do NOT paste the template inline or write a custom format. The `paper-notes-lite` skill defines the canonical structure.
+
 **What this produces (per paper):**
-- Structured 6-part notes: Background → Motivation/Gap → Method (module-level detail, formulas) → Experiments (full tables, ablations) → Limitations → Wrap-up
+- Structured 6-part notes following paper-notes-lite template: 速览 → 背景 → 动机 → 方法(module-level detail, formulas) → 实验(full tables, ablations) → 局限性 → 总结
 - Critical analysis from an experienced ML researcher perspective
 - Concrete "巧妙之处 / 潜在弱点 / 可借鉴之处" for each paper
 
